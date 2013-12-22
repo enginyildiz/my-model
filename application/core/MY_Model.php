@@ -1,6 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class MY_Model extends Core_Model {
 
+    private $field;
+
     public function __call($methodName, $args) 
     {
         if (preg_match('~^(set|get|findOneBy|findBy|orderBy)([A-Z])(.*)$~', $methodName, $matches)) {
@@ -17,13 +19,13 @@ class MY_Model extends Core_Model {
                 case 'get':
                     $this->_checkArguments($args, 0, 0);
                     return $this->get($property);
-				case 'findOneBy':
+                case 'findOneBy':
                     $this->_checkArguments($args, 1, 1);
                     return $this->findOneBy($property, $args[0]);
-				case 'findBy':
+                case 'findBy':
                     $this->_checkArguments($args, 1, 1);
                     return $this->findBy($property, $args[0]);
-				case 'orderBy':
+                case 'orderBy':
                     $this->_checkArguments($args, 0, 1);
                     return $this->orderBy($property, isset($args[0]) ? $args[0]: 'asc');
                 case 'default':
@@ -34,7 +36,6 @@ class MY_Model extends Core_Model {
 
     public function get($property) 
     {
-
         return $this->$property;
     }
 
@@ -55,7 +56,7 @@ class MY_Model extends Core_Model {
     private function _getObjectVars() 
     {
         foreach($this->_fields() as $field){
-                $fields[$field] = $this->$field;
+            $fields[$field] = $this->$field;
         }
         return $fields ;
     }
@@ -64,12 +65,7 @@ class MY_Model extends Core_Model {
     {
         return strtolower(str_replace('_Model','',get_class($this)));
     }
-	
-    private function _getFiledName($field)
-    {
-        return str_replace(' ', '', ucwords(strtolower(str_replace('_', ' ', $field))));
-    }
-	
+
     private function _getTableFields()
     {
         return $this->db->list_fields($this->_getTableName());
@@ -78,7 +74,7 @@ class MY_Model extends Core_Model {
     private function _getObjectFields()
     {
         foreach(get_object_vars($this) as $field => $value){
-                $fields[] = $field;
+            $fields[] = $field;
         }
         return $fields ;
     }
@@ -91,18 +87,21 @@ class MY_Model extends Core_Model {
     private function _fetch()
     {
         $this->db->flush_cache();
-        if(!empty($this->my_order_by))
-                $this->db->order_by($this->my_order_by, $this->my_order_type);
-        if(!empty($this->my_limit))
-                $this->db->limit($this->my_limit);
+        if (!empty($this->my_order_by)) {
+            $this->db->order_by($this->my_order_by, $this->my_order_type);
+        }
+        if (!empty($this->my_limit)) {
+            $this->db->limit($this->my_limit);
+        }
 
         if(!empty($this->my_where)) {
             if(is_array($this->my_where)) {
                 foreach($this->my_where as $item) {
-                    if($item['type'] == 'and')
+                    if ($item['type'] == 'and') {
                         $this->db->where($item['field'], $item['value']);
-                    else if($item['type'] == 'or')
+                    } else if ($item['type'] == 'or') {
                         $this->db->or_where($item['field'], $item['value']);
+                    }
                 }
             }
         }
@@ -111,7 +110,7 @@ class MY_Model extends Core_Model {
         if($result->num_rows()) {
             foreach($result->result() as $item) {
                 foreach($this->_fields() as $field ) {
-                        $this->$field = $item->$field;
+                    $this->$field = $item->$field;
                 }
                 if(method_exists($this,'relation')) {
                     foreach($this->relation() as $objectName => $object) {
@@ -288,7 +287,7 @@ class ArrayCollection implements Iterator{
     {
         if (is_array($array)) {
             $this->var = $array;
-			$this->position = 0; 
+            $this->position = 0; 
         }
     }
 
